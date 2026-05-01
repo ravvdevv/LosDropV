@@ -15,7 +15,7 @@ public static class UI
                 .Color(Color.Cyan1));
 
         var panel = new Panel(
-            new Text("⚡ GTA V Mod Deployment Tool · v1.2.0", new Style(Color.Yellow)))
+            new Text("⚡ GTA V mod installer · v1.2.0 · made by raven", new Style(Color.Yellow)))
         {
             Border = BoxBorder.Rounded,
             Padding = new Padding(1, 0, 1, 0)
@@ -29,12 +29,12 @@ public static class UI
     {
         return AnsiConsole.Prompt(
             new SelectionPrompt<string>()
-                .Title("[yellow]SELECT OPERATION[/]")
+                .Title("[yellow]What would you like to do?[/]")
                 .PageSize(10)
                 .AddChoices(new[] {
-                    "Deploy Menyoo PC",
-                    "Deploy Simple Zombies",
-                    "Deploy FULL SUITE (Both)",
+                    "Install Menyoo PC",
+                    "Install Simple Zombies",
+                    "Install both mods",
                     "Exit"
                 }));
     }
@@ -72,22 +72,22 @@ public static class UI
     public static void PrintSuccessSummary(string[] installedMods)
     {
         var table = new Table().Border(TableBorder.Rounded);
-        table.AddColumn(new TableColumn("[yellow]⚡ LosDropV · DEPLOYMENT SUCCESSFUL![/]").Centered());
+        table.AddColumn(new TableColumn("[yellow]⚡ All good - install complete![/]").Centered());
         
         foreach (var mod in installedMods)
             table.AddRow($"[green]✔[/] {mod}");
 
-        table.Caption("[magenta]Powered by LosDropV Architecture[/]");
+        table.Caption("[magenta]made by raven[/]");
         
         AnsiConsole.Write(table);
-        AnsiConsole.MarkupLine("[grey]Launch GTA V and enjoy your mods![/]");
+        AnsiConsole.MarkupLine("[grey]Open GTA V and have fun.[/]");
     }
 
     // ── Goodbye ──────────────────────────────────────────────────────────────
     public static void PrintGoodbye()
     {
         AnsiConsole.MarkupLine("\n[yellow]⚡ Thanks for using LosDropV![/]");
-        AnsiConsole.MarkupLine("[grey]Stay safe in Los Santos. 🌆[/]\n");
+        AnsiConsole.MarkupLine("[grey]made by raven · have fun in Los Santos 🌆[/]\n");
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

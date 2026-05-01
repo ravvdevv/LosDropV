@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using Spectre.Console;
 using System.Runtime.Versioning;
 
 namespace LosDropV;
@@ -111,19 +112,114 @@ public static class DirectoryDetector
     {
         while (true)
         {
-            Console.Write("\nEnter your GTA V directory path: ");
-            string? input = Console.ReadLine()?.Trim().Trim('"');
+            var candidates = GetCandidateDirectories();
+            var choices = candidates
+                .Select(path => $"[green]{Markup.Escape(path)}[/]")
+                .ToList();
 
-            if (string.IsNullOrWhiteSpace(input))
+            choices.Add("[yellow]Scan again[/]");
+            choices.Add("[grey]Type a path myself[/]");
+
+            string selected = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[yellow]Pick your GTA V folder[/]")
+                    .PageSize(12)
+                    .AddChoices(choices));
+
+            if (selected == "[yellow]Scan again[/]")
+                continue;
+
+            if (selected == "[grey]Type a path myself[/]")
             {
-                UI.PrintError("Path cannot be empty.");
+                string? manual = AnsiConsole.Prompt(
+                    new TextPrompt<string>("[yellow]Paste your GTA V folder path:[/]")
+                        .PromptStyle("white")
+                        .AllowEmpty());
+
+                string normalized = (manual ?? string.Empty).Trim().Trim('"');
+                if (!string.IsNullOrWhiteSpace(normalized) && IsValidGtaDirectory(normalized))
+                    return normalized;
+
+                UI.PrintError("That folder doesn't look like GTA V (GTA5.exe not found).");
                 continue;
             }
 
-            if (IsValidGtaDirectory(input)) return input;
+            string selectedPath = Markup.Remove(selected);
+            if (IsValidGtaDirectory(selectedPath))
+                return selectedPath;
 
-            UI.PrintError($"GTA5.exe not found in: {input}");
+            UI.PrintError("That folder isn't valid anymore, pick another one.");
         }
+    }
+
+    private static List<string> GetCandidateDirectories()
+    {
+        string[] priorityPaths =
+        [
+            @"D:\User\GAMES 3\GTA-V (Multiplayer)",
+            @"D:\Users\GAMES 3\GTA-V (Multiplayer)"
+        ];
+
+        var results = new List<string>();
+
+        foreach (var path in priorityPaths)
+        {
+            if (IsValidGtaDirectory(path))
+                results.Add(path);
+        }
+
+        string? steam = GetSteamPath();
+        string? epic = GetEpicPath();
+        string? rockstar = GetRockstarPath();
+
+        if (IsValidGtaDirectory(steam)) results.Add(steam!);
+        if (IsValidGtaDirectory(epic)) results.Add(epic!);
+        if (IsValidGtaDirectory(rockstar)) results.Add(rockstar!);
+
+        foreach (var scannedPath in ScanCommonLocations())
+        {
+            if (IsValidGtaDirectory(scannedPath))
+                results.Add(scannedPath);
+        }
+
+        return results
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    private static IEnumerable<string> ScanCommonLocations()
+    {
+        string[] commonRoots =
+        [
+            @"C:\Program Files\Rockstar Games",
+            @"C:\Program Files (x86)\Steam\steamapps\common",
+            @"D:\SteamLibrary\steamapps\common",
+            @"E:\SteamLibrary\steamapps\common"
+        ];
+
+        var found = new List<string>();
+
+        foreach (var root in commonRoots)
+        {
+            if (!Directory.Exists(root))
+                continue;
+
+            try
+            {
+                foreach (var dir in Directory.EnumerateDirectories(root))
+                {
+                    if (IsValidGtaDirectory(dir))
+                        found.Add(dir);
+                }
+            }
+            catch
+            {
+                // Ignore inaccessible folders
+            }
+        }
+
+        return found;
     }
 
     public static bool IsValidGtaDirectory(string? path)

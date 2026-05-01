@@ -1,5 +1,8 @@
+using System.Runtime.Versioning;
+
 namespace LosDropV;
 
+[SupportedOSPlatform("windows")]
 public static class App
 {
     public static async Task RunAsync()
@@ -7,10 +10,10 @@ public static class App
         UI.PrintBanner();
 
         // ── GTA V Detection ──────────────────────────────────────────────────
-        UI.PrintStep("Scanning for GTA V installation...");
+        UI.PrintStep("Looking for your GTA V folder...");
         
         string? gtaDir = null;
-        await UI.RunWithStatus("Checking registry...", async () =>
+        await UI.RunWithStatus("Quick scan running...", async () =>
         {
             await Task.Delay(400); // UI feel
             gtaDir = DirectoryDetector.FindGtaDirectory();
@@ -18,12 +21,12 @@ public static class App
 
         if (gtaDir is null)
         {
-            UI.PrintWarning("GTA V was not found automatically via registry.");
-            UI.PrintInfo("Please enter the path manually below.");
+            UI.PrintWarning("Couldn't auto-find GTA V this time.");
+            UI.PrintInfo("Pick your GTA V folder from the list below.");
             gtaDir = DirectoryDetector.PromptForDirectory();
         }
 
-        UI.PrintSuccess($"GTA V located → [white]{gtaDir}[/]");
+        UI.PrintSuccess($"Found it: [white]{gtaDir}[/]");
         UI.PrintDivider();
 
         // ── Main Loop ────────────────────────────────────────────────────────
@@ -34,13 +37,13 @@ public static class App
 
             switch (choice)
             {
-                case "Deploy Menyoo PC":
+                case "Install Menyoo PC":
                     await RunInstallation(gtaDir, installMenyoo: true,  installZombies: false);
                     break;
-                case "Deploy Simple Zombies":
+                case "Install Simple Zombies":
                     await RunInstallation(gtaDir, installMenyoo: false, installZombies: true);
                     break;
-                case "Deploy FULL SUITE (Both)":
+                case "Install both mods":
                     await RunInstallation(gtaDir, installMenyoo: true,  installZombies: true);
                     break;
                 case "Exit":
@@ -77,20 +80,20 @@ public static class App
             if (installed.Count > 0)
                 UI.PrintSuccessSummary([.. installed]);
             else
-                UI.PrintWarning("No mods were installed successfully.");
+                UI.PrintWarning("Nothing got installed.");
         }
         catch (Exception ex)
         {
-            UI.PrintError($"Unexpected error: {ex.Message}");
+            UI.PrintError($"Something went wrong: {ex.Message}");
         }
         finally
         {
-            await UI.RunWithStatus("Cleaning up temporary files...", async () =>
+            await UI.RunWithStatus("Cleaning up temp files...", async () =>
             {
                 CleanupTemp(tempDir);
                 await Task.Delay(600);
             });
-            UI.PrintInfo("Temp files removed.");
+            UI.PrintInfo("Temp files cleaned.");
         }
     }
 
@@ -116,7 +119,7 @@ public static class App
 
         if (!extracted)
         {
-            UI.PrintError("Extraction failed.");
+            UI.PrintError("Couldn't unpack the archive.");
             return false;
         }
 
