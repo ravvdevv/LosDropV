@@ -4,15 +4,6 @@ namespace LosDropV;
 
 public static class UI
 {
-    // ── Color palette ────────────────────────────────────────────────────────
-    private const string Gold   = "yellow";
-    private const string Teal   = "cyan";
-    private const string Lime   = "green";
-    private const string Rose   = "red";
-    private const string Violet = "magenta";
-    private const string Steel  = "grey";
-    private const string White  = "white";
-
     // ── Banner ───────────────────────────────────────────────────────────────
     public static void PrintBanner()
     {
@@ -21,7 +12,6 @@ public static class UI
 
         AnsiConsole.Write(
             new FigletText("LosDropV")
-                .LeftAligned()
                 .Color(Color.Cyan1));
 
         var panel = new Panel(
@@ -53,7 +43,7 @@ public static class UI
     public static void PrintSection(string title)
     {
         AnsiConsole.WriteLine();
-        AnsiConsole.Write(new Rule($"[yellow]⚡ {title.ToUpper()}[/]").LeftAligned().RuleStyle("grey"));
+        AnsiConsole.Write(new Rule($"[yellow]⚡ {title.ToUpper()}[/]").RuleStyle("grey"));
     }
 
     // ── Step / status messages ───────────────────────────────────────────────
@@ -87,10 +77,10 @@ public static class UI
         foreach (var mod in installedMods)
             table.AddRow($"[green]✔[/] {mod}");
 
-        table.AddFooter("[grey]Launch GTA V and enjoy your mods![/]");
         table.Caption("[magenta]Powered by LosDropV Architecture[/]");
         
         AnsiConsole.Write(table);
+        AnsiConsole.MarkupLine("[grey]Launch GTA V and enjoy your mods![/]");
     }
 
     // ── Goodbye ──────────────────────────────────────────────────────────────
@@ -107,4 +97,20 @@ public static class UI
         < 1024 * 1024 => $"{bytes / 1024.0:F1} KB",
         _             => $"{bytes / (1024.0 * 1024):F2} MB"
     };
+
+    // ── Progress Bar Wrapper ─────────────────────────────────────────────────
+    public static async Task RunWithProgress(string taskName, Func<ProgressContext, Task> action)
+    {
+        await AnsiConsole.Progress()
+            .Columns(
+                new TaskDescriptionColumn(),
+                new ProgressBarColumn(),
+                new PercentageColumn(),
+                new RemainingTimeColumn(),
+                new SpinnerColumn())
+            .StartAsync(async ctx =>
+            {
+                await action(ctx);
+            });
+    }
 }

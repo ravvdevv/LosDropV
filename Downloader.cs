@@ -1,3 +1,5 @@
+using Spectre.Console;
+
 namespace LosDropV;
 
 public static class Downloader
@@ -20,9 +22,8 @@ public static class Downloader
 
     public static async Task<bool> DownloadFileAsync(string url, string destinationPath)
     {
-        UI.PrintStep($"Downloading  →  {Path.GetFileName(destinationPath)}");
-        UI.PrintInfo($"URL: {url}");
-        Console.WriteLine();
+        UI.PrintStep($"Downloading [white]{Path.GetFileName(destinationPath)}[/]");
+        UI.PrintInfo($"URL: [blue]{url}[/]");
 
         try
         {
@@ -40,68 +41,32 @@ public static class Downloader
             await using FileStream fileStream = new(destinationPath, FileMode.Create,
                 FileAccess.Write, FileShare.None, 81920, true);
 
-            byte[] buffer = new byte[81920];
-            long downloadedBytes = 0;
-            int bytesRead;
-
-            // Speed tracking
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            long lastBytes = 0;
-            long lastTick = stopwatch.ElapsedMilliseconds;
-
-            Console.CursorVisible = false;
-
-            while ((bytesRead = await contentStream.ReadAsync(buffer)) > 0)
+            await UI.RunWithProgress("Download", async (ctx) =>
             {
-                await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
-                downloadedBytes += bytesRead;
+                var task = ctx.AddTask($"[cyan]{Path.GetFileName(destinationPath)}[/]", maxValue: totalBytes ?? 100);
+                
+                byte[] buffer = new byte[81920];
+                long downloadedBytes = 0;
+                int bytesRead;
 
-                long now = stopwatch.ElapsedMilliseconds;
-                long elapsed = now - lastTick;
-                double speed = elapsed > 0
-                    ? (downloadedBytes - lastBytes) / (elapsed / 1000.0)
-                    : 0;
-
-                if (elapsed >= 100) // update every 100ms
+                while ((bytesRead = await contentStream.ReadAsync(buffer)) > 0)
                 {
-                    lastBytes = downloadedBytes;
-                    lastTick  = now;
+                    await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+                    downloadedBytes += bytesRead;
+                    
+                    if (totalBytes.HasValue)
+                        task.Value = downloadedBytes;
+                    else
+                        task.Increment(bytesRead);
                 }
+            });
 
-                UI.RenderDownloadBar(downloadedBytes, totalBytes, speed);
-            }
-
-            UI.ClearProgressLine();
-            Console.CursorVisible = true;
-
-            if (totalBytes.HasValue && downloadedBytes < totalBytes.Value)
-            {
-                UI.PrintError("Download incomplete — connection dropped.");
-                return false;
-            }
-
-            UI.PrintSuccess($"Downloaded  {UI.FormatBytes(downloadedBytes)}  →  saved to temp folder");
+            UI.PrintSuccess($"Downloaded [white]{UI.FormatBytes(downloadedBytes)}[/]");
             return true;
         }
-        catch (TaskCanceledException)
+        catch (Exception ex)
         {
-            UI.ClearProgressLine();
-            Console.CursorVisible = true;
-            UI.PrintError("Download timed out. Check your internet connection.");
-            return false;
-        }
-        catch (HttpRequestException ex)
-        {
-            UI.ClearProgressLine();
-            Console.CursorVisible = true;
-            UI.PrintError($"Network error: {ex.Message}");
-            return false;
-        }
-        catch (IOException ex)
-        {
-            UI.ClearProgressLine();
-            Console.CursorVisible = true;
-            UI.PrintError($"File write error: {ex.Message}");
+            UI.PrintError($"Download failed: {ex.Message}");
             return false;
         }
     }
