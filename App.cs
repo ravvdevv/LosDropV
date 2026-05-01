@@ -8,58 +8,49 @@ public static class App
 
         // ── GTA V Detection ──────────────────────────────────────────────────
         UI.PrintStep("Scanning for GTA V installation...");
-        Console.WriteLine();
-
-        UI.StartSpinner("Checking known locations...");
-        await Task.Delay(400); // brief pause so spinner is visible
-        string? gtaDir = DirectoryDetector.FindGtaDirectory();
-        UI.StopSpinner();
+        
+        string? gtaDir = null;
+        await UI.RunWithStatus("Checking registry...", async () =>
+        {
+            await Task.Delay(400); // UI feel
+            gtaDir = DirectoryDetector.FindGtaDirectory();
+        });
 
         if (gtaDir is null)
         {
-            UI.PrintWarning("GTA V was not found automatically.");
+            UI.PrintWarning("GTA V was not found automatically via registry.");
             UI.PrintInfo("Please enter the path manually below.");
-            Console.WriteLine();
             gtaDir = DirectoryDetector.PromptForDirectory();
         }
 
-        Console.WriteLine();
-        UI.PrintSuccess($"GTA V located  →  {gtaDir}");
+        UI.PrintSuccess($"GTA V located → [white]{gtaDir}[/]");
         UI.PrintDivider();
-        Console.WriteLine();
 
         // ── Main Loop ────────────────────────────────────────────────────────
         bool running = true;
         while (running)
         {
-            UI.PrintMenu();
-            string? input = Console.ReadLine()?.Trim();
-            Console.WriteLine();
+            string choice = UI.PromptMenu();
 
-            switch (input)
+            switch (choice)
             {
-                case "1":
+                case "Deploy Menyoo PC":
                     await RunInstallation(gtaDir, installMenyoo: true,  installZombies: false);
                     break;
-                case "2":
+                case "Deploy Simple Zombies":
                     await RunInstallation(gtaDir, installMenyoo: false, installZombies: true);
                     break;
-                case "3":
+                case "Deploy FULL SUITE (Both)":
                     await RunInstallation(gtaDir, installMenyoo: true,  installZombies: true);
                     break;
-                case "4":
+                case "Exit":
                     running = false;
                     UI.PrintGoodbye();
-                    break;
-                default:
-                    UI.PrintError("Invalid choice. Enter 1, 2, 3, or 4.");
-                    Console.WriteLine();
                     break;
             }
         }
     }
 
-    // ── Installation orchestrator ─────────────────────────────────────────────
     private static async Task RunInstallation(string gtaDir, bool installMenyoo, bool installZombies)
     {
         string tempDir = Path.Combine(
@@ -94,68 +85,52 @@ public static class App
         }
         finally
         {
-            UI.StartSpinner("Cleaning up temporary files...");
-            CleanupTemp(tempDir);
-            await Task.Delay(600);
-            UI.StopSpinner("Temp files removed.", success: true);
-            Console.WriteLine();
+            await UI.RunWithStatus("Cleaning up temporary files...", async () =>
+            {
+                CleanupTemp(tempDir);
+                await Task.Delay(600);
+            });
+            UI.PrintInfo("Temp files removed.");
         }
     }
 
-    // ── Single mod pipeline ───────────────────────────────────────────────────
     private static async Task<bool> InstallSingleMod(ModInfo mod, string gtaDir, string tempDir)
     {
-        UI.PrintSection($" {mod.Name} ");
-        Console.WriteLine();
+        UI.PrintSection(mod.Name);
 
         string archivePath = Path.Combine(tempDir, mod.FileName);
 
         // 1. Download
         bool downloaded = await Downloader.DownloadFileAsync(mod.Url, archivePath);
-        if (!downloaded)
-        {
-            UI.PrintError($"Skipping {mod.Name} — download failed.");
-            UI.PrintSectionEnd();
-            Console.WriteLine();
-            return false;
-        }
-
-        Console.WriteLine();
+        if (!downloaded) return false;
 
         // 2. Extract
-        UI.StartSpinner($"Extracting {mod.FileName}...");
-        string extractDir = Path.Combine(tempDir, mod.Name.Replace(" ", "_"));
-        Directory.CreateDirectory(extractDir);
-        bool extracted = Extractor.ExtractArchive(archivePath, extractDir);
-        UI.StopSpinner(
-            extracted ? $"Extracted successfully" : $"Extraction failed",
-            success: extracted);
+        string extractDir = Path.Combine(tempDir, "Extracted_" + mod.Name.Replace(" ", ""));
+        bool extracted = false;
+        
+        await UI.RunWithStatus($"Extracting {mod.FileName}...", async () =>
+        {
+            extracted = Extractor.ExtractArchive(archivePath, extractDir);
+            await Task.Delay(400);
+        });
 
         if (!extracted)
         {
-            UI.PrintError($"Skipping {mod.Name} — extraction failed.");
-            UI.PrintSectionEnd();
-            Console.WriteLine();
+            UI.PrintError("Extraction failed.");
             return false;
         }
 
-        // 3. Install
-        UI.StartSpinner($"Installing files into GTA V directory...");
-        await Task.Delay(300); // let spinner breathe
+        // 3. Deploy
         ModInstaller.InstallMod(extractDir, gtaDir);
-        UI.StopSpinner("Files copied to GTA V directory.", success: true);
-
-        UI.PrintSectionEnd();
-        Console.WriteLine();
         return true;
     }
 
-    private static void CleanupTemp(string tempDir)
+    private static void CleanupTemp(string path)
     {
         try
         {
-            if (Directory.Exists(tempDir))
-                Directory.Delete(tempDir, recursive: true);
+            if (Directory.Exists(path))
+                Directory.Delete(path, recursive: true);
         }
         catch { }
     }

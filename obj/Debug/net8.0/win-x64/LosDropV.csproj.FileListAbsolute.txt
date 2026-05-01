@@ -198,3 +198,4 @@ D:\Download_D\EZModV\GTAVModInstaller\obj\Debug\net8.0\win-x64\refint\LosDropV.d
 D:\Download_D\EZModV\GTAVModInstaller\obj\Debug\net8.0\win-x64\LosDropV.pdb
 D:\Download_D\EZModV\GTAVModInstaller\obj\Debug\net8.0\win-x64\LosDropV.genruntimeconfig.cache
 D:\Download_D\EZModV\GTAVModInstaller\obj\Debug\net8.0\win-x64\ref\LosDropV.dll
+D:\Download_D\EZModV\GTAVModInstaller\obj\Debug\net8.0\win-x64\LosDropV.sourcelink.json

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("LosDropV - GTA V Mod Installer")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+243303f53ff843ee41af0f3e85504c85bafdfcee")]
 [assembly: System.Reflection.AssemblyProductAttribute("LosDropV")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LosDropV")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
