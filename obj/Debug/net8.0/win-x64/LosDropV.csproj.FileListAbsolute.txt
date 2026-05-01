@@ -199,3 +199,5 @@ D:\Download_D\EZModV\GTAVModInstaller\obj\Debug\net8.0\win-x64\LosDropV.pdb
 D:\Download_D\EZModV\GTAVModInstaller\obj\Debug\net8.0\win-x64\LosDropV.genruntimeconfig.cache
 D:\Download_D\EZModV\GTAVModInstaller\obj\Debug\net8.0\win-x64\ref\LosDropV.dll
 D:\Download_D\EZModV\GTAVModInstaller\obj\Debug\net8.0\win-x64\LosDropV.sourcelink.json
+D:\Download_D\EZModV\GTAVModInstaller\bin\Debug\net8.0\win-x64\Spectre.Console.dll
+D:\Download_D\EZModV\GTAVModInstaller\bin\Debug\net8.0\win-x64\Spectre.Console.Ansi.dll

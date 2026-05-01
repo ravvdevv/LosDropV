@@ -10,6 +10,20 @@ public static class DirectoryDetector
 
     public static string? FindGtaDirectory()
     {
+        UI.PrintInfo("Checking high-priority custom paths...");
+
+        string[] priorityPaths = 
+        [
+            @"D:\User\GAMES 3\GTA-V (Multiplayer)",
+            @"D:\Users\GAMES 3\GTA-V (Multiplayer)"
+        ];
+
+        foreach (var path in priorityPaths)
+        {
+            UI.PrintInfo($"  Scanning: {path}");
+            if (IsValidGtaDirectory(path)) return path;
+        }
+
         UI.PrintInfo("Locating GTA V via Windows Registry...");
 
         // 1. Check Steam
