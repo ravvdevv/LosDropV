@@ -41,12 +41,13 @@ public static class Downloader
             await using FileStream fileStream = new(destinationPath, FileMode.Create,
                 FileAccess.Write, FileShare.None, 81920, true);
 
+            long downloadedBytes = 0;
+
             await UI.RunWithProgress("Download", async (ctx) =>
             {
                 var task = ctx.AddTask($"[cyan]{Path.GetFileName(destinationPath)}[/]", maxValue: totalBytes ?? 100);
                 
                 byte[] buffer = new byte[81920];
-                long downloadedBytes = 0;
                 int bytesRead;
 
                 while ((bytesRead = await contentStream.ReadAsync(buffer)) > 0)

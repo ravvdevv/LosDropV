@@ -10,6 +10,7 @@
       "LosDropV/1.0.0": {
         "dependencies": {
           "SharpCompress": "0.37.2",
+          "Spectre.Console": "0.55.2",
           "runtimepack.Microsoft.NETCore.App.Runtime.win-x64": "8.0.26"
         },
         "runtime": {
@@ -34,7 +35,23 @@
             "assemblyVersion": "8.0.0.0",
             "fileVersion": "8.0.2626.16921"
           },
+          "System.Collections.Specialized.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.2626.16921"
+          },
           "System.Collections.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.2626.16921"
+          },
+          "System.ComponentModel.Primitives.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.2626.16921"
+          },
+          "System.ComponentModel.TypeConverter.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.2626.16921"
+          },
+          "System.ComponentModel.dll": {
             "assemblyVersion": "8.0.0.0",
             "fileVersion": "8.0.2626.16921"
           },
@@ -59,10 +76,6 @@
             "fileVersion": "8.0.2626.16921"
           },
           "System.IO.Compression.dll": {
-            "assemblyVersion": "8.0.0.0",
-            "fileVersion": "8.0.2626.16921"
-          },
-          "System.IO.FileSystem.DriveInfo.dll": {
             "assemblyVersion": "8.0.0.0",
             "fileVersion": "8.0.2626.16921"
           },
@@ -99,6 +112,10 @@
             "fileVersion": "8.0.2626.16921"
           },
           "System.Net.Sockets.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.2626.16921"
+          },
+          "System.ObjectModel.dll": {
             "assemblyVersion": "8.0.0.0",
             "fileVersion": "8.0.2626.16921"
           },
@@ -141,6 +158,10 @@
           "System.Threading.Channels.dll": {
             "assemblyVersion": "8.0.0.0",
             "fileVersion": "8.0.2626.16921"
+          },
+          "System.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "8.0.2626.16921"
           }
         }
       },
@@ -152,6 +173,25 @@
           "lib/net8.0/SharpCompress.dll": {
             "assemblyVersion": "0.37.2.0",
             "fileVersion": "0.37.2.0"
+          }
+        }
+      },
+      "Spectre.Console/0.55.2": {
+        "dependencies": {
+          "Spectre.Console.Ansi": "0.55.2"
+        },
+        "runtime": {
+          "lib/net8.0/Spectre.Console.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.55.2.0"
+          }
+        }
+      },
+      "Spectre.Console.Ansi/0.55.2": {
+        "runtime": {
+          "lib/net8.0/Spectre.Console.Ansi.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.55.2.0"
           }
         }
       },
@@ -182,6 +222,20 @@
       "sha512": "sha512-cFBpTct57aubLQXkdqMmgP8GGTFRh7fnRWP53lgE/EYUpDZJ27SSvTkdjB4OYQRZ20SJFpzczUquKLbt/9xkhw==",
       "path": "sharpcompress/0.37.2",
       "hashPath": "sharpcompress.0.37.2.nupkg.sha512"
+    },
+    "Spectre.Console/0.55.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-yc0g12YJpmZHofGJLTQX02/uqfzJ6XHRx6pe9rANNjleQptXMHPxD9KI2/DWkXiJWddc+4oizEdGox15c89hhw==",
+      "path": "spectre.console/0.55.2",
+      "hashPath": "spectre.console.0.55.2.nupkg.sha512"
+    },
+    "Spectre.Console.Ansi/0.55.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tN3KEJQQZwLW9HJnG5YTSAxfBwxsmg1wVuGvhGG2rM+pbl+NGaHU8pDcNofPlOXlgpkbpBMxI5t9o9qPfy3sHQ==",
+      "path": "spectre.console.ansi/0.55.2",
+      "hashPath": "spectre.console.ansi.0.55.2.nupkg.sha512"
     },
     "ZstdSharp.Port/0.8.0": {
       "type": "package",
